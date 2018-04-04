@@ -1,6 +1,6 @@
 /hy/version.py
 *.pyc
-.*.sw?
+*swp
 *hy*egg*
 *pyreadline*egg*
 .tox
@@ -9,4 +9,3 @@ dist
 .coverage
 build/
 /.cache
-/.pytest_cache

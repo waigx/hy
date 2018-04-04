@@ -253,11 +253,10 @@ def run_icommand(source, **kwargs):
 
 USAGE = "%(prog)s [-h | -i cmd | -c cmd | -m module | file | -] [arg] ..."
 VERSION = "%(prog)s " + hy.__version__
-EPILOG = """
-  file                  program read from script
-  module                module to execute as main
-  -                     program read from stdin
-  [arg] ...             arguments passed to program in sys.argv[1:]
+EPILOG = """  file         program read from script
+  module       module to execute as main
+  -            program read from stdin
+  [arg] ...    arguments passed to program in sys.argv[1:]
 """
 
 
@@ -271,10 +270,9 @@ def cmdline_handler(scriptname, argv):
                         help="program passed in as a string")
     parser.add_argument("-m", dest="mod",
                         help="module to run, passed in as a string")
-    parser.add_argument("-E", action='store_true',
-                        help="ignore PYTHON* environment variables")
-    parser.add_argument("-i", dest="icommand",
-                        help="program passed in as a string, then stay in REPL")
+    parser.add_argument(
+        "-i", dest="icommand",
+        help="program passed in as a string, then stay in REPL")
     parser.add_argument("--spy", action="store_true",
                         help="print equivalent Python code before executing")
     parser.add_argument("--repl-output-fn",
@@ -311,10 +309,6 @@ def cmdline_handler(scriptname, argv):
 
     # reset sys.argv like Python
     sys.argv = options.args + module_args or [""]
-
-    if options.E:
-        # User did "hy -E ..."
-        _remove_python_envs()
 
     if options.command:
         # User did "hy -c ..."
@@ -442,10 +436,3 @@ def _print_for_windows(src):
             print(line)
         except:
             print(line.encode('utf-8'))
-
-# remove PYTHON* environment variables,
-# such as "PYTHONPATH"
-def _remove_python_envs():
-    for key in list(os.environ.keys()):
-        if key.startswith("PYTHON"):
-            os.environ.pop(key)

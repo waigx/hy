@@ -20,8 +20,10 @@ import hy.inspect
 
 import traceback
 import importlib
+import codecs
 import ast
 import sys
+import keyword
 import copy
 
 from collections import defaultdict
@@ -2036,10 +2038,7 @@ class HyASTCompiler(object):
     def compile_class_expression(self, expressions):
         def rewire_init(expr):
             new_args = []
-            if (isinstance(expr, HyExpression)
-                and len(expr) > 1
-                and isinstance(expr[0], HySymbol)
-                and expr[0] == HySymbol("setv")):
+            if expr[0] == HySymbol("setv"):
                 pairs = expr[1:]
                 while len(pairs) > 0:
                     k, v = (pairs.pop(0), pairs.pop(0))
@@ -2071,12 +2070,13 @@ class HyASTCompiler(object):
         body = Result()
 
         # grab the doc string, if there is one
-        docstring = None
         if expressions and isinstance(expressions[0], HyString):
             docstring = expressions.pop(0)
-            if not PY37:
-                body += self.compile(docstring).expr_as_stmt()
-                docstring = None
+            symb = HySymbol("__doc__")
+            symb.start_line = docstring.start_line
+            symb.start_column = docstring.start_column
+            body += self._compile_assign(symb, docstring)
+            body += body.expr_as_stmt()
 
         if expressions and isinstance(expressions[0], HyList) \
            and not isinstance(expressions[0], HyExpression):
@@ -2087,8 +2087,7 @@ class HyASTCompiler(object):
             body += self.compile(rewire_init(expr))
 
         for expression in expressions:
-            e = self.compile(rewire_init(macroexpand(expression, self)))
-            body += e + e.expr_as_stmt()
+            body += self.compile(rewire_init(macroexpand(expression, self)))
 
         if not body.stmts:
             body += asty.Pass(expressions)
@@ -2101,8 +2100,7 @@ class HyASTCompiler(object):
             starargs=None,
             kwargs=None,
             bases=bases_expr,
-            body=body.stmts,
-            docstring=(None if docstring is None else str_type(docstring)))
+            body=body.stmts)
 
     @builds("dispatch-tag-macro")
     @checkargs(exact=2)

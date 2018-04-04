@@ -22,13 +22,11 @@ New Features
 * Added `mangle` and `unmangle` as core functions
 * `defclass` in Python 3 now supports specifying metaclasses and other
   keyword arguments
-* Added a command-line option `-E` per CPython
 
 Bug Fixes
 ------------------------------
 * Fix `(return)` so it works correctly to exit a Python 2 generator
 * Fixed a case where `->` and `->>` duplicated an argument
-* Fixed bugs that caused `defclass` to drop statements or crash
 
 Misc. Improvements
 ----------------------------

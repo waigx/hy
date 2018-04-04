@@ -127,14 +127,3 @@
   (setv b (B))
   (assert (= a.x 1))
   (assert (= b.x 2)))
-
-(defn test-class-sideeffects []
-  "NATIVE: test that defclass runs all expressions"
-  (defn set-sentinel []
-    (setv set-sentinel.set True))
-  (setv set-sentinel.set False)
-
-  (defclass A []
-    (set-sentinel))
-
-  (assert set-sentinel.set))
